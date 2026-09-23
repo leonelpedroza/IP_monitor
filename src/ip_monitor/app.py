@@ -14,6 +14,7 @@ import argparse
 import contextlib
 import ctypes
 import logging
+import os
 import sys
 import tkinter as tk
 from pathlib import Path
@@ -80,6 +81,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--backend", choices=["auto", "icmp_api", "ping3", "ping_exe"], help="probe backend")
     parser.add_argument("--debug", action="store_true", help="verbose application log")
     parser.add_argument("--version", action="version", version=f"{APP_NAME} {__version__}")
+    if sys.stdout is None:  # windowed executable: argparse cannot print
+        sys.stdout = open(os.devnull, "w", encoding="utf-8")  # noqa: SIM115
+    if sys.stderr is None:
+        sys.stderr = open(os.devnull, "w", encoding="utf-8")  # noqa: SIM115
     return parser.parse_args(argv)
 
 

@@ -30,7 +30,7 @@ function Invoke-Checked {
     param([string]$Exe, [string[]]$Arguments)
     Write-Host ">> $Exe $($Arguments -join ' ')" -ForegroundColor Cyan
     & $Exe @Arguments
-    if ($LASTEXITCODE -ne 0) { throw "Command failed with exit code $LASTEXITCODE: $Exe $Arguments" }
+    if ($LASTEXITCODE -ne 0) { throw "Command failed with exit code ${LASTEXITCODE}: $Exe $Arguments" }
 }
 
 if ($Clean) {
@@ -41,8 +41,10 @@ if ($Clean) {
 $venvPython = Join-Path $PSScriptRoot ".venv\Scripts\python.exe"
 if (-not (Test-Path $venvPython)) {
     Write-Host "Creating virtual environment with '$Python'..." -ForegroundColor Yellow
-    $parts = $Python -split " "
-    Invoke-Checked $parts[0] ($parts[1..($parts.Length-1)] + @("-m", "venv", ".venv"))
+    $parts = @($Python -split " ")
+    $launcherArgs = @()
+    if ($parts.Length -gt 1) { $launcherArgs = @($parts[1..($parts.Length - 1)]) }
+    Invoke-Checked $parts[0] ($launcherArgs + @("-m", "venv", ".venv"))
 }
 $pyVersion = & $venvPython -c "import sys; print('%d.%d.%d' % sys.version_info[:3])"
 Write-Host "Using Python $pyVersion from .venv" -ForegroundColor Green
@@ -103,7 +105,11 @@ if ($OneFile) {
     Write-Host "Created $oneZip" -ForegroundColor Green
 }
 
-# ---- smoke test of the frozen executable -----------------------------------
+# ---- sanity check ----------------------------------------------------------
+# (IPMonitor.exe is a windowed executable: it has no console, so it is not run
+#  here.  Launch it manually and check Help -> About.)
 $exe = Join-Path $distDir "IPMonitor.exe"
-Invoke-Checked $exe @("--version")
-Write-Host "Build complete." -ForegroundColor Green
+if (-not (Test-Path $exe)) { throw "Build finished but $exe was not produced." }
+$size = [math]::Round((Get-Item $exe).Length / 1MB, 1)
+Write-Host "Build complete: $exe ($size MB)" -ForegroundColor Green
+Write-Host "Portable package: $zip" -ForegroundColor Green
