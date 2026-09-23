@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ip-monitor"
+description = "Lightweight real-time ICMP reachability monitor for network engineers"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+authors = [{name = "Leonel Pedroza"}]
+dynamic = ["version"]
+dependencies = [
+    "ping3>=4.0.4",
+    "matplotlib>=3.8",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.5",
+    "mypy>=1.10",
+    "pyinstaller>=6.10",
+]
+
+[project.scripts]
+ip-monitor = "ip_monitor.app:main"
+
+[project.gui-scripts]
+ip-monitor-gui = "ip_monitor.app:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.dynamic]
+version = {attr = "ip_monitor.version.__version__"}
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+markers = [
+    "gui: tests that open a real Tk window (skipped when no display is available)",
+]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+ignore = ["SIM108"]
+
+[tool.mypy]
+python_version = "3.10"
+mypy_path = "src"
+ignore_missing_imports = true
+warn_unused_ignores = false
+check_untyped_defs = true

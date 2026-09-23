@@ -1,0 +1,6 @@
+# Development, test and packaging dependencies.
+-r requirements.txt
+pytest>=8.0           # test runner
+ruff>=0.5             # linter + formatter
+mypy>=1.10            # optional static type checking
+pyinstaller>=6.10     # Windows executable (6.16+ required for Python 3.14)

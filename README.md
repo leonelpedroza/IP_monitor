@@ -1,218 +1,124 @@
-# IP Monitor 
+# IP Monitor
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Python-3.7+-blue.svg" alt="Python Version">
-  <img src="https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-green.svg" alt="Platform">
-  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License">
-</p>
-<p align="center">
-  <img src="https://img.shields.io/badge/Python-Networking-blue?style=for-the-badge&logo=python&logoColor=white">
-</p>
+Lightweight, real-time ICMP reachability monitor for network engineers.
+Enter a few IPv4 addresses or hostnames, click **Add**, and watch reachability
+and latency during a maintenance window — without opening a dozen CMD windows.
 
-##
+**Version 2.0.0** · Windows 11 x64 (portable) · Python 3.12/3.13 from source · Tkinter GUI · License: GPL (see [LICENSE](LICENSE))
 
-English Version
-![](https://github.com/leonelpedroza/ip_monitor/blob/main/UKFlag.png)
+> Screenshot placeholders: `docs/img/main-window.png`, `docs/img/history-graph.png`
 
-## History 
+## What it is (and is not)
 
-I've been migrating and upgrading network equipment since Genesis, chapter 1, verse 1, and I always routinely run a series of pings from a CMD window in Windows or Linux to see, in real time, when something that should be responding stops responding.
+IP Monitor is the GUI equivalent of running `ping -t` against several hosts at
+once. It is meant for router/switch migrations, firewall changes, WAN/LAN
+troubleshooting, device replacement and other maintenance-window work.
 
-CMD Ping it's effective and practical monitoring. It doesn't require too many reflectors. Especially when an SNMP-type management system is too sophisticated and cumbersome to monitor just a few IP addresses during a maintenance window, and more isn't necessary. But constantly opening command windows and running those four or five pings, aside from taking up space on your monitor, takes seconds. That's how this idea came to me. Nothing sophisticated. A simple glance, and you understand what's happening during your maintenance window with a simple look.
-
-I didn't create this program to perform a lengthy network monitoring process and replace a modern professional management tool. It's just a tool with a Windows interface, nothing too fancy, easy to use, and uncomplicated.
-
-I decided to publish it on GitHub after the LLM (or misnamed IA's), so fashionable today, reorganized and gave me the green light to my old Python program. After reviewing and commenting on the code more professionally, and standardizing it following the PEP 8 – Style Guide for Python Code.
-
-## Introduction
-
-A powerful, lightweight utility for monitoring the status and response times of multiple IP addresses and domains in real-time.
-<p align="center">
-  <img src="Screenshot1_.png" alt="IP Monitor GUI" width="600">
-  <br>
-  <em>IP Monitor main window</em>
-</p>
-
- 
-## Overview
-IP Address Monitor is a Python-based desktop application designed to provide real-time monitoring of network endpoints. It allows users to track connectivity, response times, and performance metrics for multiple IP addresses or domain names simultaneously, with an intuitive graphical interface.
+It is **not** a replacement for SolarWinds, PRTG, Zabbix, Nagios, Catalyst
+Center or any SNMP-based NMS. It sends ICMP Echo Requests and nothing else.
 
 ## Features
-•	**Real-time ping monitoring** of multiple IP addresses and domain names
 
-•	**Visual status indicators** with color-coded rows for quick status assessment: 
-  - **Light green:** All pings successful
-  - **Light red:** All pings failed
-  - **Light yellow:** Mixed results
+- Monitor up to 64 IPv4 addresses / DNS hostnames simultaneously
+- Configurable probe interval (1–60 s) and per-probe timeout
+- Per-target status (OK, Timeout, Unreachable, DNS failure, …), row colour (green = up, red = down, yellow = degraded), last-10 probe history, current / min / max / average RTT, packet-loss %
+- Distinguishes **success, timeout, destination unreachable, DNS failure, invalid address, network error, permission error, ICMP unavailable, stopped** — not just "failed"
+- Colour-coded rows, pie/status charts (last 60 probes), history graph (in-memory, up to 6 h at 2 s) — non-modal, auto-refreshing
+- Per-target pause/resume, reset, delete, reorder (buttons, context menu); global Stop All / Start All / Restart All / Reset All
+- Sound notification on status change (per target, toggle with the bell)
+- Optional CSV probe log, statistics export (Save dialog), save/load target lists (1.x files still load)
+- Settings, window size and last target list persist between sessions
+- Three ICMP backends, auto-selected: Windows `IcmpSendEcho` API (no Administrator needed), `ping3`, or `ping.exe`
+- High-DPI aware (100 %–200 % scaling), no Administrator privileges, no Internet access, no telemetry
 
-•	**Sound notifications** for status changes (can be toggled for each IP address)
+## Portable installation (Windows 11)
 
-•	**Comprehensive statistics** for each monitored endpoint: 
-  -	Fastest response time
-  -	Slowest response time
-  -	Average response time
+1. Download `IPMonitor-2.0.0-Windows-x64.zip`.
+2. Extract it anywhere (Desktop, `C:\Tools`, USB stick).
+3. Double-click `IPMonitor\IPMonitor.exe`.
 
-•	**Ping history visualization** (last 10 pings).
-  
-•	**Customizable ping interval** (2-10 seconds between pings).
+Python, pip and the source code are **not** required on the target PC.
+SmartScreen may warn about an unsigned executable the first time — see
+[docs/INSTALLATION.md](docs/INSTALLATION.md).
 
-•	**Graphical history view** of ping performance over time.
+## Running from source
 
-•	**Export statistics** to CSV format for further analysis.
+```powershell
+git clone https://github.com/leonelpedroza/ip_monitor.git
+cd ip_monitor
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -e .
+python -m ip_monitor          # or: python IPMonitor.pyw
+```
 
-•	**Persistent configuration** that saves monitored IPs and settings between.sessions
+Supported Python: **3.12 (baseline) and 3.13**. Python 3.14 runs from source
+with current matplotlib/PyInstaller releases but is not the packaging
+baseline (see [docs/INSTALLATION.md](docs/INSTALLATION.md)).
 
-<p align="center">
-  <img src="Screenshot2_.png" alt="IP Monitor GUI" width="600">
-  <br>
-  <em>IP Monitor - Histogram</em>
-</p>
+## Where data is stored
 
-## Requirements
-•	Python 3.6 or higher
+| Item | Location |
+|------|----------|
+| Settings | `%LOCALAPPDATA%\IPMonitor\config\settings.json` |
+| Application log | `%LOCALAPPDATA%\IPMonitor\logs\ip_monitor.log` (rotating) |
+| CSV probe logs | `%LOCALAPPDATA%\IPMonitor\logs\` |
+| Saved target lists | `%LOCALAPPDATA%\IPMonitor\targets\` |
+| Exports (default folder) | `%LOCALAPPDATA%\IPMonitor\exports\` |
 
-•	Required Python packages: 
+**Portable mode:** create an empty `portable.txt` next to `IPMonitor.exe`; data
+then lives in `<exe folder>\data\` if that folder is writable. Override
+everything with `--data-dir <folder>`. Tools → *Open Data Folder* opens the
+active location.
 
-*	**tkinter** (included with most Python installations)
-*	**ping3** (pip install ping3)
-*	**matplotlib** (for graph visualization, pip install matplotlib)
-  
-## Installation
-1.	Clone the repository:
-2.	git clone https://github.com/leonelpedroza/ip-monitor.git
-3.	cd ip-monitor
-4.	Install dependencies:
-5.	pip install -r requirements.txt
-6.	Run the application:
-7.	python ip_monitor_gui.pyw
+## Building the executable
 
-## Usage
-## Adding IP Addresses or Domains
-1.	Enter an IP address or domain name in the input field at the top of the application.
-2.	Press Enter or click the "Add" button.
-## Monitoring Controls
-•	**Toggle Sound Notifications:** Click the bell icon for each IP to enable/disable sound alerts when status changes.
+```powershell
+.\build.ps1            # onedir build + ZIP in dist\
+.\build.ps1 -OneFile   # additionally produce a single-file exe
+```
 
-•	**Reset Statistics:** Click the "_Reset_" button for an individual IP or "_Reset All Stats_" to clear all statistics.
+Details: [docs/BUILD_WINDOWS.md](docs/BUILD_WINDOWS.md).
 
-•	**Pause/Resume Monitoring:** Click "_Stop_" or "_Start_" for individual IPs, or use "_Stop All Pings" / "Start All Pings_" for all endpoints.
+## Documentation
 
-•	**Remove IP:** Click the "_Delete_" button to remove an IP from monitoring.
+- [docs/INSTALLATION.md](docs/INSTALLATION.md) — portable install, source install, Python versions
+- [docs/USAGE.md](docs/USAGE.md) — every control and status explained
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — threading model, module map, why the 1.x crash cannot return
+- [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) — dev environment, tests, lint
+- [docs/BUILD_WINDOWS.md](docs/BUILD_WINDOWS.md) — PyInstaller build and packaging
+- [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) — "ping fails but the device is up", backends, permissions
+- [CHANGELOG.md](CHANGELOG.md)
 
-•	**View Graph:** Click "_View Graph_" to display a historical graph of ping times.
+## Known limitations
 
-## Exporting Data
-•	Use "_Reset & Save Stats_" to export current statistics to a CSV file with a timestamp.
+- IPv4 only. IPv6 addresses are recognised and rejected with a clear message; the probe abstraction is ready for an IPv6 backend.
+- ICMP Echo only — no TCP/HTTP checks.
+- Sound notifications use `winsound`; on other platforms the terminal bell is used.
+- The `icmp_api` and `ping_exe` backends report RTT with 1 ms resolution (Windows API limitation); `ping3` reports sub-millisecond values.
+- Unsigned executable → SmartScreen prompt on first run.
+- One thread per target; 64 targets maximum by design.
+
 ## License
-GPL
-## Contributing
-Contributions, issues, and feature requests are welcome. Feel free to check the issues page if you want to contribute.
-________________________________________
 
-# Monitor de Direcciones IP
-Español
-![](https://github.com/leonelpedroza/ip_monitor/blob/main/SpainFlag.png)
-## Historia  
+The original repository declared **GPL** in its README text while the badge
+said MIT and the source carried no license header. This release standardises
+on **GPL-3.0** as the author's stated intent; see [LICENSE](LICENSE).
 
+---
 
-He estado migrando y actualizando equipos de red desde el Génesis, capítulo 1, versículo 1, y siempre ejecuto una serie de pings desde una ventana de CMD en Windows o Linux para ver, en tiempo real, cuándo algo que debería estar respondiendo, deja de hacerlo.
+# IP Monitor (Español)
 
-El uso del comando CMD Ping es un monitoreo muy básico, eficaz y práctico. No requiere nada fuera de lo común, y es especialmente útil cuando un sistema de gestión tipo SNMP es demasiado sofisticado y engorroso para monitorizar solo unas pocas direcciones IP durante una ventana de mantenimiento, y no se necesitan más. Pero abrir constantemente ventanas de comandos y ejecutar esos cuatro o cinco pings, además de ocupar espacio en el monitor, toma segundos. Así surgió esta idea. Nada sofisticado. Con un simple vistazo, se entiende lo que está sucediendo durante la ventana de mantenimiento.
+Monitor ligero de alcanzabilidad ICMP en tiempo real para ingenieros de red.
+Ingrese direcciones IPv4 o nombres de host, pulse **Add** y observe la
+alcanzabilidad y latencia durante una ventana de mantenimiento, sin abrir
+múltiples ventanas de CMD.
 
-No creé este programa para realizar un largo proceso de monitorización de red ni para reemplazar una herramienta de gestión profesional moderna. Es simplemente una herramienta con interfaz de Windows, sencilla, fácil de usar y sin complicaciones.
+- Instalación portátil: descargue el ZIP, descomprima y ejecute `IPMonitor.exe` (no requiere Python).
+- Desde el código fuente: Python 3.12 o 3.13, `pip install -e .`, `python -m ip_monitor`.
+- Datos del usuario: `%LOCALAPPDATA%\IPMonitor\` (modo portátil con `portable.txt`).
+- Solo IPv4 y solo ICMP Echo. No reemplaza un sistema de gestión SNMP.
+- Licencia: GPL-3.0 (ver LICENSE).
 
-Decidí publicarlo en GitHub después de que el LLM (o mal llamado IA), tan de moda hoy en día, lo reorganizara y me diera luz verde para mi antiguo programa de Python, tras revisar y comentar el código de forma más profesional, y estandarizarlo siguiendo la PEP 8: Guía de Estilo para Código Python.
-
-
-
-## Introducción
-
-Una utilidad potente y ligera para monitorear el estado y tiempos de respuesta de múltiples direcciones IP y dominios en tiempo real.
-
-<p align="center">
-  <img src="Screenshot1_.png" alt="IP Monitor GUI" width="600">
-  <br>
-  <em>IP Monitor ventana principal</em>
-</p>
-
-
- 
-## Descripción general
-**IP Monitor** es una aplicación de escritorio basada en Python y diseñada para proporcionar monitoreo en tiempo real de puntos finales de red. Permite a los usuarios realizar seguimiento de conectividad, tiempos de respuesta y métricas de rendimiento para múltiples direcciones IP o nombres de dominio simultáneamente, con una interfaz gráfica intuitiva.
-## Características
-•	**Monitoreo de ping en tiempo real** para múltiples direcciones IP y nombres de dominio
-•	**Indicadores visuales de estado** con filas codificadas por colores para una evaluación rápida del estado: 
-*	**Verde claro:** Todos los pings exitosos
-*	**Rojo claro:** Todos los pings fallidos
-*	**Amarillo claro:** Resultados mixtos
-
-•	**Notificaciones sonoras** para cambios de estado (se pueden activar/desactivar para cada dirección IP)
-
-•	**Estadísticas completas** para cada punto final monitoreado: 
-*	Tiempo de respuesta más rápido
-*	Tiempo de respuesta más lento
-*	Tiempo de respuesta promedio
- 
-*	Visualización del historial de ping (últimos 10 pings)
-
-•	Intervalo de ping personalizable (2-10 segundos entre pings)
-
-•	Vista gráfica del historial de rendimiento de ping a lo largo del tiempo
-
-•	Exportación de estadísticas a formato CSV para análisis adicional
-
-•	Configuración persistente que guarda las IPs monitoreadas y la configuración entre sesiones
-
-
-<p align="center">
-  <img src="Screenshot2_.png" alt="IP Monitor GUI" width="600">
-  <br>
-  <em>IP Monitor - Histograma</em>
-</p>
-
-
-
-## Requisitos
-
-•	Python 3.6 o superior
-•	Paquetes de Python requeridos: 
-*	**tkinter** (incluido con la mayoría de las instalaciones de Python)
-*	**ping3** (pip install ping3)
-*	**matplotlib** (para visualización gráfica, pip install matplotlib)
-
-## Instalación
-
-1.	Clonar el repositorio:
-2.	git clone https://github.com/leonelpedroza/ip-monitor.git
-3.	cd ip-monitor
-4.	Instalar dependencias:
-5.	pip install -r requirements.txt
-6.	Ejecutar la aplicación:
-7.	python ip_monitor_gui.pyw
-
-## Uso
-
-## Añadir direcciones IP o dominios
-
-1.	Ingrese una dirección IP o nombre de dominio en el campo de entrada en la parte superior de la aplicación.
-2.	Presione Enter o haga clic en el botón "Add".
-## Controles de monitoreo
-
-•	**Alternar notificaciones de sonido:** Haga clic en el icono de campana para cada IP para habilitar/deshabilitar alertas sonoras cuando cambie el estado.
-
-•	**Restablecer estadísticas:** Haga clic en el botón "_Reset_" para una IP individual o "_Reset All Stats_" para borrar todas las estadísticas.
-
-•	**Pausar/Reanudar monitoreo:** Haga clic en "_Stop" o "Start_" para IPs individuales, o use "_Stop All Pings" / "Start All Pings_" para todos los nodos.
-
-•	**Eliminar IP:** Haga clic en el botón "_Delete_" para eliminar una IP del monitoreo.
-
-•	**Ver gráfico:** Haga clic en _"View Graph_" para mostrar un gráfico histórico de los tiempos de ping.
-
-## Exportar datos
-
-•	Use "_Reset & Save Stats_" para exportar las estadísticas actuales a un archivo CSV con una marca de tiempo.
-## Licencia
-GPL
-## Contribuciones
-Las contribuciones, problemas y solicitudes de funciones son bienvenidas. No dude en consultar la página de problemas si desea contribuir.
-
+La documentación completa (en inglés) está en la carpeta `docs/`.
