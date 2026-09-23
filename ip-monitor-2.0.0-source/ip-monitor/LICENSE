@@ -1,0 +1,31 @@
+IP Monitor
+Copyright (C) 2025-2026 Leonel Pedroza
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+----------------------------------------------------------------------
+NOTE TO THE PROJECT OWNER (remove this block once resolved)
+
+The supplied project contained inconsistent license declarations:
+  * README.md badge:        "License-MIT"
+  * README.md text (EN/ES): "License: GPL" (version not specified)
+  * ip_monitor_gui.pyw:     no license header at all
+
+The prose in both languages states GPL, so this file adopts GPL-3.0 as the
+author's evident intent.  To finish the job:
+  1. Confirm GPL-3.0 (or choose MIT and update this file plus README).
+  2. Append the full GPL-3.0 text from https://www.gnu.org/licenses/gpl-3.0.txt
+     below this notice (it is ~35 KB and is deliberately not embedded here).
+  3. Keep README.md, pyproject.toml ("license") and this file in agreement.
+----------------------------------------------------------------------

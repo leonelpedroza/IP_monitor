@@ -1,0 +1,4 @@
+# Runtime dependencies (installed by `pip install -r requirements.txt`).
+# Kept deliberately small.
+ping3>=4.0.4          # pure-Python ICMP echo (fallback backend; primary on non-Windows)
+matplotlib>=3.8       # history graph only (loaded lazily on first use)
